@@ -7,11 +7,11 @@ COPY pnpm-lock.yaml package.json ./
 # --- Stage 2: Development ---
 # This stage keeps devDependencies and source code for hot-reloading
 FROM base AS development
-# ENV NODE_ENV=development
-RUN pnpm install
+ENV NODE_ENV=development
+RUN pnpm install --frozen-lockfile
 COPY . .
 EXPOSE $PORT
-# Start the server with tsx watch mode
+# Start the server with nodemon
 CMD ["pnpm", "run", "dev"]
 
 # --- Stage 3: Production (Build Prep) ---
