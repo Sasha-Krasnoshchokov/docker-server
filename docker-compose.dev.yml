@@ -16,3 +16,27 @@ services:
       - TSX_LOADER_FALLBACK=1
       - CHOKIDAR_USEPOLLING=1
       - CHOKIDAR_INTERVAL=100
+      - DATABASE_URL=postgresql://devUser:devPassword@db:5432/devdb
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres:16-alpine
+    container_name: dev-postgres-db
+    environment:
+      POSTGRES_USER: devUser
+      POSTGRES_PASSWORD: devPassword
+      POSTGRES_DB: devdb
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata_dev:/var/lib/postgresql/data
+      - ./init-db-dev:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devUser -d devdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata_dev:
