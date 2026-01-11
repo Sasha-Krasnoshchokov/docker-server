@@ -1,0 +1,18 @@
+services:
+  api:
+    image: dev-server
+    build:
+      context: .
+      target: development # <--- Stops at the development stage
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - /app/node_modules # Anonymous volume to protect container node_modules
+    ports:
+      - 3210:3210
+    environment:
+      - NODE_ENV=development
+      - PORT=3210
+      - TSX_LOADER_FALLBACK=1
+      - CHOKIDAR_USEPOLLING=1
+      - CHOKIDAR_INTERVAL=100
