@@ -2,6 +2,7 @@ import express from "express";
 import helmet from "helmet";
 import cors from "cors";
 import { env } from "./config/env";
+import { healthCheck } from "./db/healthCheck";
 
 const app = express();
 
@@ -13,7 +14,16 @@ app.use(express.json());
 // Health Check
 app.get("/health", (req, res) => {
   console.info(`Request from ${req.host}`);
-  res.status(200).json({ status: "OK", uptime: process.uptime() });
+  res.status(200).json({ status: "OK", message: "Server Healthy", uptime: process.uptime() });
+});
+app.get("/health-db", async (req, res) => {
+  console.info(`Request from ${req.host}`);
+  const dbHealthy = await healthCheck();
+  if (!dbHealthy) {
+    res.status(500).json({ status: "", message: "Database Unhealthy", uptime: process.uptime()});
+    throw new Error("Database Unhealthy");
+  }
+  res.status(200).json({ status: "OK", message: "Database Healthy", uptime: process.uptime() });
 });
 
 // Centralized Error Handler (Must be last)
