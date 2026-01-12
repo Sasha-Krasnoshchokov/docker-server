@@ -35,8 +35,6 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 # Create user and group
 RUN addgroup -S app && adduser -S app -G app
 
-RUN apk add --no-cache wget
-
 # Copy only production dependencies
 COPY pnpm-lock.yaml package.json ./
 RUN pnpm install --prod --frozen-lockfile
@@ -52,8 +50,5 @@ COPY --from=builder --chown=app:app /app/dist ./dist
 USER app
 
 EXPOSE $PORT
-
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT}/health || exit 1
 
 CMD ["node", "dist/server.js"]
