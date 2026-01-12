@@ -1,6 +1,7 @@
 # --- Stage 1: Base (Shared) ---
 FROM node:20-alpine AS base
 RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN apk add --no-cache curl
 WORKDIR /app
 COPY pnpm-lock.yaml package.json ./
 
@@ -48,6 +49,7 @@ COPY --from=builder --chown=app:app /app/dist ./dist
 
 # Switch user
 USER app
+USER node
 
 EXPOSE $PORT
 
