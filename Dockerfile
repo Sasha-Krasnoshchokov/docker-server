@@ -31,21 +31,17 @@ WORKDIR /app
 
 # Install pnpm and set production env
 RUN corepack enable && corepack prepare pnpm@latest --activate
-# ENV NODE_ENV=production
 
 # Create user and group
 RUN addgroup -S app && adduser -S app -G app
 
 # Copy only production dependencies
 COPY pnpm-lock.yaml package.json ./
-RUN pnpm install --prod --frozen-lockfile
+RUN pnpm install --production --frozen-lockfile
 
 # Copy compiled output from builder
 # Set ownership
 COPY --from=builder --chown=app:app /app/dist ./dist
-
-# If you have static assets
-# COPY --from=builder --chown=app:app /app/public ./public
 
 # Switch user
 USER app
@@ -53,4 +49,4 @@ USER node
 
 EXPOSE $PORT
 
-CMD ["node", "dist/server.js"]
+CMD ["node", "--max-old-space-size=350", "dist/server.js"]
